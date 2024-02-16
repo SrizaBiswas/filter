@@ -242,7 +242,7 @@ export const BookDetail = (props) => {
     "Horror",
     "Humor",
     "Mythology",
-    " Nonfiction",
+    "Nonfiction",
     "Poetry",
     "Paranormal",
     "Romance",

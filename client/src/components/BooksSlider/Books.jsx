@@ -43,7 +43,7 @@ const Books = () => {
   return (
     <div className="container">
       <div className="text-center mb-10 max-w-[600px] mx-auto">
-        <h1 className="text-3xl font-bold">All Books</h1>
+        <h1 className="text-3xl font-bold">New Books</h1>
       </div>
       {bookdata == undefined && <Loading />}
       <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 place-items-center gap-5 ">

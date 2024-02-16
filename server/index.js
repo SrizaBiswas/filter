@@ -565,6 +565,149 @@ app.post("/get-audiobk", async (req, res) => {
   }
 });
 
+//edit-audiobooks
+app.post(
+  "/edit-audiobook",
+  upload.fields([
+    { name: "audioBkImage", maxCount: 1 },
+    { name: "audioBkCon", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      const { audioBkName, audioAuthName, audioBkGenre, audioDesp } = req.body;
+
+      const audioBkImage = req.files["audioBkImage"]
+        ? req.files["audioBkImage"][0]
+        : null;
+      const audioBkCon = req.files["audioBkCon"]
+        ? req.files["audioBkCon"][0]
+        : null;
+
+      const audiobookInfo = await Audiobook.findOne({
+        audioBkName: audioBkName,
+      });
+
+      if (!audiobookInfo) {
+        return res.send({ message: "book doesn't exists!" });
+      }
+
+      if (audioAuthName) audiobookInfo.audioAuthName = audioAuthName;
+      if (audioBkGenre) audiobookInfo.audioBkGenre = audioBkGenre;
+      if (audioDesp) audiobookInfo.audioDesp = audioDesp;
+
+      let audioBkImagePath = "";
+      let audioBkConPath = "";
+
+      if (audioBkImage) {
+        const bufferaudioBkImage = audioBkImage.buffer;
+        const audioBkImagePathPublic = `../client/public/users/audioBookCover/${
+          audioBkName + "_" + audioBkImage.originalname
+        }`; //why is ` used??
+        await writeFile(audioBkImagePathPublic, bufferaudioBkImage);
+
+        audioBkImagePath = `/users/audioBookCover/${
+          audioBkName + "_" + audioBkImage.originalname
+        }`;
+        audiobookInfo.audioBkImage = audioBkImagePath;
+      }
+
+      if (audioBkCon) {
+        const bufferaudioBkCon = audioBkCon.buffer;
+        const audioBkConPathPublic = `../client/public/users/audioBookCon/${
+          audioBkName + "_" + audioBkCon.originalname
+        }`;
+        await writeFile(audioBkConPathPublic, bufferaudioBkCon);
+
+        audioBkConPath = `/users/audioBookCon/${
+          audioBkName + "_" + audioBkCon.originalname
+        }`;
+        audiobookInfo.audioBkCon = audioBkConPath;
+      }
+
+      await audiobookInfo.save();
+      // const book = new Book({
+      //   bkname,
+      //   authname,
+      //   bkimage: bkImgPath,
+      //   bkgenre,
+      //   desp,
+      //   bkcon: bkConPath,
+      // });
+      return res.send({
+        message: "Audiobook edited Successfully!",
+        status: "ok",
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  }
+);
+
+//delete Audiobook
+const delAudiobookSchema = new mongoose.Schema(
+  {
+    audioBkName: {
+      type: String,
+      required: true,
+    },
+    audioAuthName: {
+      type: String,
+      required: true,
+    },
+    audioBkImage: {
+      type: String,
+      required: true,
+    },
+    audioBkGenre: {
+      type: String,
+      required: true,
+    },
+    audioDesp: {
+      type: String,
+      required: true,
+    },
+    audioBkCon: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+
+const DelAudiobook = new mongoose.model("DelAudiobook", delAudiobookSchema);
+
+app.post("/delaudiobook", async (req, res) => {
+  try {
+    const { audioBkName } = req.body;
+    console.log(audioBkName);
+    const audiobookExist = await Audiobook.findOne({
+      audioBkName: audioBkName,
+    });
+    console.log(audiobookExist);
+    if (!audiobookExist) {
+      return res.send({ message: "book doesn't exists!" });
+    }
+
+    const delaudiobook = new DelAudiobook({
+      audioBkName: audiobookExist.audioBkName,
+      audioAuthName: audiobookExist.audioAuthName,
+      audioBkImage: audiobookExist.audioBkImage,
+      audioBkGenre: audiobookExist.audioBkGenre,
+      audioDesp: audiobookExist.audioDesp,
+      audioBkCon: audiobookExist.audioBkCon,
+    });
+
+    await delaudiobook.save();
+
+    await Audiobook.deleteOne({ audioBkName });
+
+    return res.send({ message: "book deleted successfully !", status: "del" });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 app.listen(3001, () => {
   console.log("\nBE started at port 3001");
 });

@@ -22,7 +22,7 @@ const Adddbook = () => {
     "Horror",
     "Humor",
     "Mythology",
-    " Nonfiction",
+    "Nonfiction",
     "Poetry",
     "Paranormal",
     "Romance",

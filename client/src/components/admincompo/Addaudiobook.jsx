@@ -23,7 +23,7 @@ const Addaudiobook = () => {
     "Horror",
     "Humor",
     "Mythology",
-    " Nonfiction",
+    "Nonfiction",
     "Poetry",
     "Paranormal",
     "Romance",
@@ -69,7 +69,7 @@ const Addaudiobook = () => {
 
       axios.post("http://localhost:3001/addaudiobook", data).then((res) => {
         alert(res.data.message);
-        navigate("/audiobooks");
+        navigate("/admin/audiobooks");
       });
     } else {
       alert("Invalid input");
